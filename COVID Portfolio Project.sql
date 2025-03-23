@@ -38,10 +38,6 @@ from CovidDeaths
 order by 1,2
 
 --looking at Total Cases VS Total Deaths 'in my country'
---select location,date,total_cases,total_deaths, (total_deaths/total_cases) *100  as DeathsPercentage
---from CovidDeaths
---order by 1,2
-
 SELECT location,date,total_cases,total_deaths,
     CASE 
         WHEN CAST(total_cases AS FLOAT) = 0 THEN NULL
@@ -53,11 +49,6 @@ ORDER BY  4 desc
 
 
 --looking at Total Cases VS. Population
---select location,date,total_cases,population, (total_cases/population) * 100 as TotalCasesVSPopulation
---from CovidDeaths
---where location like '%egy%'
---ORDER BY YEAR(date) ASC, MONTH(date) ASC, DAY(date) ASC;
-
 select location,date,population,total_cases,
     CASE 
         WHEN CAST(total_cases AS FLOAT) = 0 THEN NULL  
