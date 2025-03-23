@@ -124,7 +124,6 @@ UPDATE CovidVaccinations
 SELECT CD.continent,CD.location,CD.DATE,CD.population,CV.new_vaccinations
 ,SUM(CONVERT(INT, CV.new_vaccinations))
 OVER (PARTITION BY CD.LOCATION ORDER BY CD.LOCATION,CD.DATE) AS RollingPeopleVaccinated
---, (RollingPeopleVaccinated/population)*100
 FROM CovidDeaths CD JOIN CovidVaccinations CV
 ON CD.location=CV.location AND CD.date=CV.date
 WHERE CD.continent IS NOT NULL
@@ -140,12 +139,11 @@ AS
 SELECT CD.continent,CD.location,CD.DATE,CD.population,CV.new_vaccinations
 ,SUM(CONVERT(INT, CV.new_vaccinations))
 OVER (PARTITION BY CD.LOCATION ORDER BY CD.LOCATION,CD.DATE) AS RollingPeopleVaccinated
---, (RollingPeopleVaccinated/population)*100
 FROM CovidDeaths CD JOIN CovidVaccinations CV
 ON CD.location=CV.location AND CD.date=CV.date
 WHERE CD.continent IS NOT NULL
---ORDER BY 2,3
 )
+	
 SELECT *,(RollingPeopleVaccinated/POPULATION)*100
 FROM POPVSVAC
 
@@ -170,11 +168,9 @@ INSERT INTO [#PopulationVaccinatedin%]
 SELECT CD.continent,CD.location,CD.DATE,CD.population,CV.new_vaccinations
 ,SUM(CONVERT(INT, CV.new_vaccinations))
 OVER (PARTITION BY CD.LOCATION ORDER BY CD.LOCATION,CD.DATE) AS RollingPeopleVaccinated
---, (RollingPeopleVaccinated/population)*100
 FROM CovidDeaths CD JOIN CovidVaccinations CV
 ON CD.location=CV.location AND CD.date=CV.date
---WHERE CD.continent IS NOT NULL
---ORDER BY 2,3
+
 
 SELECT *,(RollingPeopleVaccinated/POPULATION)*100
 FROM [#PopulationVaccinatedin%]
@@ -188,7 +184,6 @@ Create View [PopulationVaccinatedin%] as
 SELECT CD.continent,CD.location,CD.DATE,CD.population,CV.new_vaccinations
 ,SUM(CONVERT(INT, CV.new_vaccinations))
 OVER (PARTITION BY CD.LOCATION ORDER BY CD.LOCATION,CD.DATE) AS RollingPeopleVaccinated
---, (RollingPeopleVaccinated/population)*100
 FROM CovidDeaths CD JOIN CovidVaccinations CV
 ON CD.location=CV.location AND CD.date=CV.date
 WHERE CD.continent IS NOT NULL
