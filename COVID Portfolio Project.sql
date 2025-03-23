@@ -1,3 +1,10 @@
+/*
+Covid 19 Data Exploration 
+
+Skills used: Joins, CTE's, Temp Tables, Windows Functions, Aggregate Functions, Creating Views, Converting Data Types
+
+*/
+
 select * from CovidProject..CovidDeaths
 order by 3,4
 
@@ -32,12 +39,17 @@ update CovidDeaths
       set continent = Null 
 	  where continent = ''
 
---select Data that we are gonna be using
+	
+-- Select Data that we are going to be starting with
+	
 select location,date,total_cases,new_cases,total_deaths,population
 from CovidDeaths
 order by 1,2
 
---looking at Total Cases VS Total Deaths 'in my country'
+	
+-- Total Cases vs Total Deaths
+-- Shows likelihood of dying if you contract covid in your country
+	
 SELECT location,date,total_cases,total_deaths,
     CASE 
         WHEN CAST(total_cases AS FLOAT) = 0 THEN NULL
@@ -47,8 +59,11 @@ FROM CovidDeaths
 where location like '%egy%'
 ORDER BY  4 desc
 
+	
 
---looking at Total Cases VS. Population
+-- Total Cases vs Population
+-- Shows what percentage of population infected with Covid
+	
 select location,date,population,total_cases,
     CASE 
         WHEN CAST(total_cases AS FLOAT) = 0 THEN NULL  
@@ -59,33 +74,49 @@ WHERE location LIKE '%egy%'
 ORDER BY YEAR(date) ASC, MONTH(date) ASC, DAY(date) ASC;
 
 
---Looking at Countries with highest Infection Rate compared to Populaion
+
+-- Countries with Highest Infection Rate compared to Population
+
 SELECT location,population,MAX(total_cases) AS HighestInfectionCountry, MAX((total_cases / NULLIF(population, 0)) * 100) AS [PopulationInfectedIn%]
 FROM CovidDeaths
 GROUP BY location, population
 ORDER BY [PopulationInfectedIn%] desc
 
---Showing Countries with highest Death Count per Population
+
+	
+-- Countries with Highest Death Count per Population
+	
 SELECT location, Max(cast(total_deaths as int)) as TotalDeathcount
 FROM CovidDeaths
 where continent is not null
 GROUP BY location
 ORDER BY TotalDeathcount desc
 
---Let's break things down by Continent
---Showing Continents with the highest deaths count per population 
+
+	
+-- BREAKING THINGS DOWN BY CONTINENT
+
+-- Showing contintents with the highest death count per population 
+	
 SELECT continent, Max(cast(total_deaths as int)) as TotalDeathcount
 FROM CovidDeaths
 where continent is not null
 GROUP BY continent
 ORDER BY TotalDeathcount desc
 
+
+	
 --Global Numbers
+	
 SELECT  SUM(new_cases) as total_cases, SUM(CAST(new_deaths AS INT)) as total_deaths, SUM(CAST(new_deaths AS INT)) / NULLIF(SUM(new_cases), 0) * 100 AS [Death%]
 FROM CovidDeaths
 WHERE continent IS NOT NULL
 
---LOOKING AT TOTAL POPULATION VS. VACCINATIONS
+
+	
+-- Total Population vs Vaccinations
+-- Shows Percentage of Population that has recieved at least one Covid Vaccine	
+	
 UPDATE CovidVaccinations
       SET new_vaccinations = NULL
 	  WHERE new_vaccinations = ''
@@ -99,7 +130,10 @@ ON CD.location=CV.location AND CD.date=CV.date
 WHERE CD.continent IS NOT NULL
 ORDER BY 2,3
 
---USE CTE
+
+	
+-- Using CTE to perform Calculation on Partition By in previous query
+	
 WITH POPVSVAC(CONTINENT,LOCATION,DATE,POPULATION,New_Vaccinations,RollingPeopleVaccinated)
 AS
 (
@@ -116,7 +150,10 @@ SELECT *,(RollingPeopleVaccinated/POPULATION)*100
 FROM POPVSVAC
 
 
---USE TEMP TABLE
+
+	
+-- Using Temp Table to perform Calculation on Partition By in previous query
+	
 DROP TABLE IF EXISTS [#PopulationVaccinatedin%]
 create TABLE [#PopulationVaccinatedin%]
 (
@@ -144,7 +181,8 @@ FROM [#PopulationVaccinatedin%]
 
 
 
---Creating View to store data for later visualizations
+	
+-- Using Temp Table to perform Calculation on Partition By in previous query
 
 Create View [PopulationVaccinatedin%] as
 SELECT CD.continent,CD.location,CD.DATE,CD.population,CV.new_vaccinations
@@ -154,8 +192,6 @@ OVER (PARTITION BY CD.LOCATION ORDER BY CD.LOCATION,CD.DATE) AS RollingPeopleVac
 FROM CovidDeaths CD JOIN CovidVaccinations CV
 ON CD.location=CV.location AND CD.date=CV.date
 WHERE CD.continent IS NOT NULL
---ORDER BY 2,3
-
 
 Select * 
 from [PopulationVaccinatedin%]
