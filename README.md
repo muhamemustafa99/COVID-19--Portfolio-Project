@@ -69,6 +69,8 @@ These SQL components reflect real-world BI analyst work in data cleaning, modeli
 📧 muhamedmustafa9933@icloud.com  
 🌍 [LinkedIn Profile](https://www.linkedin.com/in/mohamedmostafa99/)  
 💻 [GitHub](https://github.com/muhamemustafa99)
+ **My Portfolio: ** (https://mohamed5034.wordpress.com/about/)
+
 
 ---
 
